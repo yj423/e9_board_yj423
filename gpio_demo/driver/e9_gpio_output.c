@@ -23,7 +23,7 @@
 MODULE_LICENSE("GPL");  
 
 /* There are 50 pins on J6 of e9 board. */
-#define J5_PINS_NUM (50)
+#define J6_PINS_NUM (50)
 
 struct e9_J6_PIN_DESC{
 	int gpio_group;
@@ -41,7 +41,7 @@ struct e9_J6_PIN_DESC{
 	.is_gpio = (is),	\
 }
 						
-static struct e9_J6_PIN_DESC e9_J6_pins[J5_PINS_NUM] = {
+static struct e9_J6_PIN_DESC e9_J6_pins[J6_PINS_NUM] = {
 	PIN_DESC(-1, -1, "GND", 0),
 	PIN_DESC(-1, -1, "5V", 0),
 	PIN_DESC(-1, -1, "DP4", 0),
@@ -121,8 +121,8 @@ static ssize_t e9_gpio_output_store_high(struct device *dev,
 	nr = simple_strtol(buf, &after, 10);
 	dev_dbg(&pdev->dev, "Pin %d wants to be high\n", nr);	
 
-	if(nr > J5_PINS_NUM){	
-		dev_err(&pdev->dev, "The max pin number is %d. Try again.\r", J5_PINS_NUM);
+	if(nr > J6_PINS_NUM){	
+		dev_err(&pdev->dev, "The max pin number is %d. Try again.\r", J6_PINS_NUM);
 	}else{
 		if(e9_J6_pins[nr-1].can_use){
 			imx_gpio_nr =  IMX_GPIO_NR(e9_J6_pins[nr-1].gpio_group, e9_J6_pins[nr-1].gpio_nr);
@@ -159,8 +159,8 @@ static ssize_t e9_gpio_output_store_low(struct device *dev,
 	nr = simple_strtol(buf, &after, 10);
 	dev_dbg(&pdev->dev, "Pin %d wants to be low\n", nr);	
 
-	if(nr > J5_PINS_NUM){
-		dev_err(&pdev->dev, "The max pin number is %d. Try again.\r", J5_PINS_NUM);
+	if(nr > J6_PINS_NUM){
+		dev_err(&pdev->dev, "The max pin number is %d. Try again.\r", J6_PINS_NUM);
 	}else{
 		if(e9_J6_pins[nr-1].can_use){
 			imx_gpio_nr =  IMX_GPIO_NR(e9_J6_pins[nr-1].gpio_group, e9_J6_pins[nr-1].gpio_nr);
@@ -220,7 +220,7 @@ static struct platform_device e9_gpio_output_device = {
 
 static int __init e9_gpio_output_init(void)
 {
-    	int ret, i, imx_gpio_nr, cnt = 0;
+    int ret, i, imx_gpio_nr, cnt = 0;
 	struct device *dev;
 	
 	ret = platform_device_register(&e9_gpio_output_device);
@@ -231,7 +231,7 @@ static int __init e9_gpio_output_init(void)
 
 	dev = &e9_gpio_output_device.dev;
 	
-	for(i = 0; i < J5_PINS_NUM; i ++){
+	for(i = 0; i < J6_PINS_NUM; i ++){
 		if(e9_J6_pins[i].is_gpio){
 			if(e9_J6_pins[i].gpio_group == -1 || e9_J6_pins[i].gpio_nr == -1){
 				e9_J6_pins[i].can_use = 0;
@@ -261,6 +261,7 @@ static int __init e9_gpio_output_init(void)
 			}
 		}
 	}
+	
 	dev_info(dev, "Successful in getting %d gpios\n", cnt);
 	ret = sysfs_create_group(&e9_gpio_output_device.dev.kobj, &e9_gpio_attr_group);
 	if (ret){
@@ -275,7 +276,7 @@ fail2:
 #if 0
 fail1:
 #endif
-	while(i--){
+	while(--i >= 0){
 		imx_gpio_nr =  IMX_GPIO_NR(e9_J6_pins[i].gpio_group, e9_J6_pins[i].gpio_nr);
 		gpio_free(imx_gpio_nr);
 	}
@@ -289,7 +290,7 @@ static void __exit e9_gpio_output_exit(void)
 	
 	sysfs_remove_group(&e9_gpio_output_device.dev.kobj, &e9_gpio_attr_group);
 	
-	for(i = 0; i < J5_PINS_NUM; i ++){
+	for(i = 0; i < J6_PINS_NUM; i ++){
 		if(e9_J6_pins[i].can_use){
 			if(e9_J6_pins[i].gpio_group != -1 && e9_J6_pins[i].gpio_nr != -1){
 				imx_gpio_nr =  IMX_GPIO_NR(e9_J6_pins[i].gpio_group, e9_J6_pins[i].gpio_nr);
