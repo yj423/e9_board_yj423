@@ -1,7 +1,7 @@
 /*
  * Driver for gpio output on E9 board.
  *
- * Copyright 2NOT_GPIO14 Jone Yim
+ * Copyright 2015 Jone Yim yj4231@hotmail.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -23,7 +23,7 @@
 
 MODULE_LICENSE("GPL");  
 
-/* There are 5NOT_GPIO pins on J6 of e9 board. */
+/* There are 50 pins on J6 of e9 board. */
 #define J6_PINS_NUM (50)
 
 struct e9_J6_PIN_DESC{
@@ -48,7 +48,7 @@ struct e9_J6_PIN_DESC{
 #define NOT_GPIO (0)	
 
 static struct e9_J6_PIN_DESC e9_J6_pins[J6_PINS_NUM] = {
-	/* Pin 1 to 1NOT_GPIO*/
+	/* Pin 1 to 10*/
 	PIN_DESC(-1, -1, -1, "GND", NOT_GPIO),
 	PIN_DESC(-1, -1, -1, "5V", NOT_GPIO),
 	PIN_DESC(-1, -1, -1, "DP4", NOT_GPIO),
@@ -58,10 +58,10 @@ static struct e9_J6_PIN_DESC e9_J6_pins[J6_PINS_NUM] = {
 	PIN_DESC(-1, -1, -1, "GND", NOT_GPIO),
 	PIN_DESC(-1, -1, -1, "3.3V", NOT_GPIO),
 	PIN_DESC(MX6Q_PAD_ENET_TX_EN__GPIO_1_28, 1, 28, "GPIO1_28", IS_GPIO), 
-	PIN_DESC(MX6Q_PAD_EIM_D17__GPIO_3_17, 3, 17, "EIM_D17 ", IS_GPIO),
+	PIN_DESC(MX6Q_PAD_EIM_D17__GPIO_3_17, 3, 17, "EIM_D17 ", NOT_GPIO),
 
-	/* Pin 11 to 2NOT_GPIO*/
-	PIN_DESC(MX6Q_PAD_EIM_D18__GPIO_3_18, 3, 18, "EIM_D18", IS_GPIO),
+	/* Pin 11 to 20*/
+	PIN_DESC(MX6Q_PAD_EIM_D18__GPIO_3_18, 3, 18, "EIM_D18", NOT_GPIO),
 	PIN_DESC(MX6Q_PAD_EIM_D21__GPIO_3_21, 3, 21, "EIM_D21", IS_GPIO), 
 	PIN_DESC(MX6Q_PAD_EIM_D16__GPIO_3_16, 3, 16, "EIM_D16", IS_GPIO), 
 	PIN_DESC(MX6Q_PAD_EIM_D19__GPIO_3_19, 3, 19, "EIM_D19", IS_GPIO), 
@@ -96,7 +96,7 @@ static struct e9_J6_PIN_DESC e9_J6_pins[J6_PINS_NUM] = {
 	PIN_DESC(-1, -1,  -1, "CSPI2_MOSI", NOT_GPIO),
 	PIN_DESC(-1, -1,  -1, "CSPI2_CLK", NOT_GPIO),
 	
-	/* Pin 41 to 5NOT_GPIO*/
+	/* Pin 41 to 50*/
 	PIN_DESC(-1, -1,  -1, "CSPI2_CS0", NOT_GPIO),
 	PIN_DESC(-1, -1,  -1, "SD3_DATA2", NOT_GPIO),
 	PIN_DESC(-1, -1,  -1, "SD3_DATA3", NOT_GPIO),
@@ -117,7 +117,7 @@ static ssize_t e9_gpio_output_show_high(struct device *dev,
 	
 	/*Do nothing*/				
 									
-	return NOT_GPIO;							
+	return 0;							
 }
 
 static ssize_t e9_gpio_output_store_high(struct device *dev,		
@@ -155,7 +155,7 @@ static ssize_t e9_gpio_output_show_low(struct device *dev,
 	
 	/*Do nothing*/					
 									
-	return NOT_GPIO;							
+	return 0;							
 }
 
 static ssize_t e9_gpio_output_store_low(struct device *dev,		
@@ -175,7 +175,7 @@ static ssize_t e9_gpio_output_store_low(struct device *dev,
 	}else{
 		if(e9_J6_pins[nr-1].can_use){
 			imx_gpio_nr =  IMX_GPIO_NR(e9_J6_pins[nr-1].gpio_group, e9_J6_pins[nr-1].gpio_nr);
-			gpio_set_value(imx_gpio_nr, NOT_GPIO);
+			gpio_set_value(imx_gpio_nr, 0);
 		}else{
 			dev_err(&pdev->dev, "The pin %d cannot be used as a gpio,so it cannot be operated.\n", nr);
 		}
@@ -223,7 +223,7 @@ static void e9_gpio_output_release(struct device *dev)
 static struct platform_device e9_gpio_output_device = {
 	.name		= "e9_gpio_output",
 	.id		= -1,
-	.num_resources  = NOT_GPIO,
+	.num_resources  = 0,
 	.dev = {
 		.release = e9_gpio_output_release,
 	},
@@ -231,11 +231,11 @@ static struct platform_device e9_gpio_output_device = {
 
 static int __init e9_gpio_output_init(void)
 {
-    int ret, i, imx_gpio_nr, cnt = NOT_GPIO;
+    int ret, i, imx_gpio_nr, cnt = 0;
 	struct device *dev;
 	
 	ret = platform_device_register(&e9_gpio_output_device);
-	if(ret < NOT_GPIO){
+	if(ret < 0){
 		printk("Failed to register platform device\n");
 		return -1;
 	}	
@@ -282,14 +282,14 @@ static int __init e9_gpio_output_init(void)
 			ret);
 		goto fail2;
 	}
-	return NOT_GPIO;
+	return 0;
 
 fail2:
 	platform_device_unregister(&e9_gpio_output_device);
-#if NOT_GPIO
+#if 0
 fail1:
 #endif
-	while(--i >= NOT_GPIO){
+	while(--i >= 0){
 		imx_gpio_nr =  IMX_GPIO_NR(e9_J6_pins[i].gpio_group, e9_J6_pins[i].gpio_nr);
 		gpio_free(imx_gpio_nr);
 	}
@@ -303,12 +303,12 @@ static void __exit e9_gpio_output_exit(void)
 	
 	sysfs_remove_group(&e9_gpio_output_device.dev.kobj, &e9_gpio_attr_group);
 	
-	for(i = NOT_GPIO; i < J6_PINS_NUM; i ++){
+	for(i = 0; i < J6_PINS_NUM; i ++){
 		if(e9_J6_pins[i].can_use){
 			if(e9_J6_pins[i].gpio_group != -1 && e9_J6_pins[i].gpio_nr != -1){
 				imx_gpio_nr =  IMX_GPIO_NR(e9_J6_pins[i].gpio_group, e9_J6_pins[i].gpio_nr);
 				gpio_free(imx_gpio_nr);
-				e9_J6_pins[i].can_use = NOT_GPIO;
+				e9_J6_pins[i].can_use = 0;
 			}
 		}
 	}
@@ -321,5 +321,5 @@ module_init(e9_gpio_output_init);
 module_exit(e9_gpio_output_exit);
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("jun.yan2@hirain.com");
+MODULE_AUTHOR("yj4231@hotmail.com");
 MODULE_DESCRIPTION("E9 Board GPIO Output Driver");
