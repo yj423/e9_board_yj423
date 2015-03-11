@@ -25,6 +25,7 @@ __attribute__((section("__versions"))) = {
 	{ 0xc045c476, "_dev_info" },
 	{ 0xa8f59416, "gpio_direction_output" },
 	{ 0x47229b5c, "gpio_request" },
+	{ 0x2db6ffff, "mxc_iomux_v3_setup_pad" },
 	{ 0x27e1a049, "printk" },
 	{ 0x97f445, "platform_device_register" },
 	{ 0x432fd7f6, "__gpio_set_value" },

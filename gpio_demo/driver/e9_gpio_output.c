@@ -1,7 +1,7 @@
 /*
  * Driver for gpio output on E9 board.
  *
- * Copyright 2014 Jone Yim
+ * Copyright 2NOT_GPIO14 Jone Yim
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -19,13 +19,15 @@
 #include <linux/gpio.h>
 
 #include <mach/iomux-mx6q.h>
+#include <mach/iomux-mx6q.h>
 
 MODULE_LICENSE("GPL");  
 
-/* There are 50 pins on J6 of e9 board. */
+/* There are 5NOT_GPIO pins on J6 of e9 board. */
 #define J6_PINS_NUM (50)
 
 struct e9_J6_PIN_DESC{
+	iomux_v3_cfg_t pad;
 	int gpio_group;
 	int gpio_nr;
 	char *desc;
@@ -33,69 +35,78 @@ struct e9_J6_PIN_DESC{
 	int can_use;
 };
 
-#define PIN_DESC(g,nr,d,is)  	\
+#define PIN_DESC(p,g,nr,d,is)  	\
 {						\
+	.pad = (p),			\
 	.gpio_group = (g),	\
 	.gpio_nr = (nr), 	\
 	.desc = (d),		\
 	.is_gpio = (is),	\
 }
 						
+#define IS_GPIO (1)
+#define NOT_GPIO (0)	
+
 static struct e9_J6_PIN_DESC e9_J6_pins[J6_PINS_NUM] = {
-	PIN_DESC(-1, -1, "GND", 0),
-	PIN_DESC(-1, -1, "5V", 0),
-	PIN_DESC(-1, -1, "DP4", 0),
-	PIN_DESC(-1, -1, "DP3", 0),
-	PIN_DESC(-1, -1, "DM4", 0),
-	PIN_DESC(-1, -1, "DM3", 0),
-	PIN_DESC(-1, -1, "GND", 0),
-	PIN_DESC(-1, -1, "3.3V", 0),
-	PIN_DESC(1, 28, "GPIO1_28", 1), 
-	PIN_DESC(3, 17, "EIM_D17 ", 1),
+	/* Pin 1 to 1NOT_GPIO*/
+	PIN_DESC(-1, -1, -1, "GND", NOT_GPIO),
+	PIN_DESC(-1, -1, -1, "5V", NOT_GPIO),
+	PIN_DESC(-1, -1, -1, "DP4", NOT_GPIO),
+	PIN_DESC(-1, -1, -1, "DP3", NOT_GPIO),
+	PIN_DESC(-1, -1, -1, "DM4", NOT_GPIO),
+	PIN_DESC(-1, -1, -1, "DM3", NOT_GPIO),
+	PIN_DESC(-1, -1, -1, "GND", NOT_GPIO),
+	PIN_DESC(-1, -1, -1, "3.3V", NOT_GPIO),
+	PIN_DESC(MX6Q_PAD_ENET_TX_EN__GPIO_1_28, 1, 28, "GPIO1_28", IS_GPIO), 
+	PIN_DESC(MX6Q_PAD_EIM_D17__GPIO_3_17, 3, 17, "EIM_D17 ", IS_GPIO),
+
+	/* Pin 11 to 2NOT_GPIO*/
+	PIN_DESC(MX6Q_PAD_EIM_D18__GPIO_3_18, 3, 18, "EIM_D18", IS_GPIO),
+	PIN_DESC(MX6Q_PAD_EIM_D21__GPIO_3_21, 3, 21, "EIM_D21", IS_GPIO), 
+	PIN_DESC(MX6Q_PAD_EIM_D16__GPIO_3_16, 3, 16, "EIM_D16", IS_GPIO), 
+	PIN_DESC(MX6Q_PAD_EIM_D19__GPIO_3_19, 3, 19, "EIM_D19", IS_GPIO), 
+	PIN_DESC(MX6Q_PAD_EIM_D30__GPIO_3_30, 3, 30, "EIM_D30", IS_GPIO), 
+	PIN_DESC(MX6Q_PAD_EIM_D20__GPIO_3_20, 3, 20, "EIM_D20", IS_GPIO),
+	PIN_DESC(MX6Q_PAD_ENET_RXD0__GPIO_1_27, 1, 27, "GPIO1_27", IS_GPIO), 
+	PIN_DESC(MX6Q_PAD_CSI0_DAT10__GPIO_5_28, 5, 28, "CSI0_DAT10", IS_GPIO),
+	PIN_DESC(MX6Q_PAD_SD1_CLK__GPIO_1_20, 1, 20, "SD1_CLK", IS_GPIO),
+	PIN_DESC(MX6Q_PAD_SD3_RST__GPIO_7_8, 7, 8, "SD3_RST", IS_GPIO),
 	
-	PIN_DESC(3, 18, "EIM_D18", 1),
-	PIN_DESC(3, 21, "EIM_D21", 1), 
-	PIN_DESC(3, 16, "EIM_D16", 1), 
-	PIN_DESC(3, 19, "EIM_D19", 1), 
-	PIN_DESC(3, 30, "EIM_D30", 1), 
-	PIN_DESC(3, 20, "EIM_D20", 1),
-	PIN_DESC(1, 27, "GPIO1_27", 1), 
-	PIN_DESC(5, 28, "CSI0_DAT10", 1),
-	PIN_DESC(1, 20, "SD1_CLK", 1),
-	PIN_DESC(7, 8, "SD3_RST", 1),
+	/* Pin 21 to 30*/
+	PIN_DESC(MX6Q_PAD_SD1_DAT2__GPIO_1_19, 1, 19, 	"PWM2", IS_GPIO),
+	PIN_DESC(MX6Q_PAD_DI0_PIN4__GPIO_4_20, 4, 20, "DISP0_CNTRST", IS_GPIO),
+	PIN_DESC(MX6Q_PAD_EIM_D22__GPIO_3_22, 3, 22, "EIM_D22", IS_GPIO), 
+	PIN_DESC(MX6Q_PAD_EIM_D23__GPIO_3_23, 3, 23, "EIM_D23", IS_GPIO), 
+	PIN_DESC(MX6Q_PAD_ENET_TXD0__GPIO_1_30, 1,  30, "GPIO1_30", IS_GPIO),  
+	PIN_DESC(-1, -1,  -1, "CAN1_RX", NOT_GPIO), 
+	PIN_DESC(-1, -1,  -1, "CAN1_TX", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "CAN2_RX", NOT_GPIO), 
+	PIN_DESC(-1, -1,  -1, "CAN2_TX", NOT_GPIO),  
+	PIN_DESC(-1, -1,  -1, "UART4_RXD ", NOT_GPIO), 
 	
-	PIN_DESC(1, 19, "PWM2", 1),
-	PIN_DESC(4, 20, "DISP0_CNTRST", 1),
-	PIN_DESC(3, 22, "EIM_D22", 1), 
-	PIN_DESC(3, 23, "EIM_D23", 1), 
-	PIN_DESC(1,  30, "GPIO1_30", 1),  
-	PIN_DESC(-1,  -1, "CAN1_RX", 0), 
-	PIN_DESC(-1,  -1, "CAN1_TX", 0),
-	PIN_DESC(-1,  -1, "CAN2_RX", 0), 
-	PIN_DESC(-1,  -1, "CAN2_TX", 0),  
-	PIN_DESC(-1,  -1, "UART4_RXD ", 0), 
+	/* Pin 31 to 40*/
+	PIN_DESC(-1, -1,  -1, "UART4_TXD", NOT_GPIO), 
+	PIN_DESC(-1, -1,  -1, "UART3_RXD", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "UART3_TXD", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "UART2_RXD", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "UART2_TXD", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "UART2_CTS", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "UART2_RTS", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "CSPI2_MISO", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "CSPI2_MOSI", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "CSPI2_CLK", NOT_GPIO),
 	
-	PIN_DESC(-1,  -1, "UART4_TXD", 0), 
-	PIN_DESC(-1,  -1, "UART3_RXD", 0),
-	PIN_DESC(-1,  -1, "UART3_TXD", 0),
-	PIN_DESC(-1,  -1, "UART2_RXD", 0),
-	PIN_DESC(-1,  -1, "UART2_TXD", 0),
-	PIN_DESC(-1,  -1, "UART2_CTS", 0),
-	PIN_DESC(-1,  -1, "UART2_RTS", 0),
-	PIN_DESC(-1,  -1, "CSPI2_MISO", 0),
-	PIN_DESC(-1,  -1, "CSPI2_MOSI", 0),
-	PIN_DESC(-1,  -1, "CSPI2_CLK", 0),
-	
-	PIN_DESC(-1,  -1, "CSPI2_CS0", 0),
-	PIN_DESC(-1,  -1, "SD3_DATA2", 0),
-	PIN_DESC(-1,  -1, "SD3_DATA3", 0),
-	PIN_DESC(-1,  -1, "SD3_DATA3", 0),
-	PIN_DESC(-1,  -1, "EIM_A25", 0),
-	PIN_DESC(-1,  -1, "SD3_CLK", 0),
-	PIN_DESC(-1,  -1, "SD3_DATA0", 0),
-	PIN_DESC(-1,  -1, "SD3_DATA1", 0),
-	PIN_DESC(-1,  -1, "PWM3", 0),
-	PIN_DESC(-1,  -1, "PWM4", 0),	
+	/* Pin 41 to 5NOT_GPIO*/
+	PIN_DESC(-1, -1,  -1, "CSPI2_CS0", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "SD3_DATA2", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "SD3_DATA3", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "SD3_DATA3", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "EIM_A25", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "SD3_CLK", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "SD3_DATAN0", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "SD3_DATA1", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "PWM3", NOT_GPIO),
+	PIN_DESC(-1, -1,  -1, "PWM4", NOT_GPIO),	
 };
 
 static ssize_t e9_gpio_output_show_high(struct device *dev,		
@@ -106,7 +117,7 @@ static ssize_t e9_gpio_output_show_high(struct device *dev,
 	
 	/*Do nothing*/				
 									
-	return 0;							
+	return NOT_GPIO;							
 }
 
 static ssize_t e9_gpio_output_store_high(struct device *dev,		
@@ -128,7 +139,7 @@ static ssize_t e9_gpio_output_store_high(struct device *dev,
 			imx_gpio_nr =  IMX_GPIO_NR(e9_J6_pins[nr-1].gpio_group, e9_J6_pins[nr-1].gpio_nr);
 			gpio_set_value(imx_gpio_nr, 1);
 		}else{
-			dev_err(&pdev->dev, "The pin %d isn't a gpio,so it cannot be operated.\n", nr);
+			dev_err(&pdev->dev, "The pin %d cannot be used as a gpio,so it cannot be operated.\n", nr);
 		}
 
 	}	
@@ -144,7 +155,7 @@ static ssize_t e9_gpio_output_show_low(struct device *dev,
 	
 	/*Do nothing*/					
 									
-	return 0;							
+	return NOT_GPIO;							
 }
 
 static ssize_t e9_gpio_output_store_low(struct device *dev,		
@@ -164,9 +175,9 @@ static ssize_t e9_gpio_output_store_low(struct device *dev,
 	}else{
 		if(e9_J6_pins[nr-1].can_use){
 			imx_gpio_nr =  IMX_GPIO_NR(e9_J6_pins[nr-1].gpio_group, e9_J6_pins[nr-1].gpio_nr);
-			gpio_set_value(imx_gpio_nr, 0);
+			gpio_set_value(imx_gpio_nr, NOT_GPIO);
 		}else{
-			dev_err(&pdev->dev, "The pin %d isn't a gpio,so it cannot be operated.\n", nr);
+			dev_err(&pdev->dev, "The pin %d cannot be used as a gpio,so it cannot be operated.\n", nr);
 		}
 
 	}	
@@ -212,7 +223,7 @@ static void e9_gpio_output_release(struct device *dev)
 static struct platform_device e9_gpio_output_device = {
 	.name		= "e9_gpio_output",
 	.id		= -1,
-	.num_resources  = 0,
+	.num_resources  = NOT_GPIO,
 	.dev = {
 		.release = e9_gpio_output_release,
 	},
@@ -220,14 +231,15 @@ static struct platform_device e9_gpio_output_device = {
 
 static int __init e9_gpio_output_init(void)
 {
-    int ret, i, imx_gpio_nr, cnt = 0;
+    int ret, i, imx_gpio_nr, cnt = NOT_GPIO;
 	struct device *dev;
 	
 	ret = platform_device_register(&e9_gpio_output_device);
-	if(ret < 0){
+	if(ret < NOT_GPIO){
 		printk("Failed to register platform device\n");
 		return -1;
 	}	
+
 
 	dev = &e9_gpio_output_device.dev;
 	
@@ -236,6 +248,7 @@ static int __init e9_gpio_output_init(void)
 			if(e9_J6_pins[i].gpio_group == -1 || e9_J6_pins[i].gpio_nr == -1){
 				e9_J6_pins[i].can_use = 0;
 			}else{
+				mxc_iomux_v3_setup_pad(e9_J6_pins[i].pad);
 				imx_gpio_nr =  IMX_GPIO_NR(e9_J6_pins[i].gpio_group, e9_J6_pins[i].gpio_nr);
 				ret = gpio_request(imx_gpio_nr, e9_J6_pins[i].desc);
 				if (ret < 0) {
@@ -269,14 +282,14 @@ static int __init e9_gpio_output_init(void)
 			ret);
 		goto fail2;
 	}
-	return 0;
+	return NOT_GPIO;
 
 fail2:
 	platform_device_unregister(&e9_gpio_output_device);
-#if 0
+#if NOT_GPIO
 fail1:
 #endif
-	while(--i >= 0){
+	while(--i >= NOT_GPIO){
 		imx_gpio_nr =  IMX_GPIO_NR(e9_J6_pins[i].gpio_group, e9_J6_pins[i].gpio_nr);
 		gpio_free(imx_gpio_nr);
 	}
@@ -290,12 +303,12 @@ static void __exit e9_gpio_output_exit(void)
 	
 	sysfs_remove_group(&e9_gpio_output_device.dev.kobj, &e9_gpio_attr_group);
 	
-	for(i = 0; i < J6_PINS_NUM; i ++){
+	for(i = NOT_GPIO; i < J6_PINS_NUM; i ++){
 		if(e9_J6_pins[i].can_use){
 			if(e9_J6_pins[i].gpio_group != -1 && e9_J6_pins[i].gpio_nr != -1){
 				imx_gpio_nr =  IMX_GPIO_NR(e9_J6_pins[i].gpio_group, e9_J6_pins[i].gpio_nr);
 				gpio_free(imx_gpio_nr);
-				e9_J6_pins[i].can_use = 0;
+				e9_J6_pins[i].can_use = NOT_GPIO;
 			}
 		}
 	}
