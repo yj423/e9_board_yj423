@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang='en'>
+ <head>
+  <meta charset='UFT-8'>
+  <meta name="Generator" content="EditPlus">
+  <meta name="Author" content="">
+  <meta name="Author" content="">
+  <meta name="Author" content="">
+  <title>{{title}}</title>
+  </head>
+  <li>
+   <h1>Hello, {{user.name}}</h1>
+   <line>age: {{user.age}}</line>
+   <li>sex: {{user.sex}}</li>
+   <li>say: {{user.say}}</li>
+
+    {% if user.age < 18 %}
+     <li>未成年<li>
+    {% else %}
+     <li>成年<li>
+    {% endif %}
+
+    {% if not user1 %}
+        <li>user1 doesn't exist<li>
+    {% endif %}
+
+    {% if  not user.name %}
+        <li>user name doesn't exist<li>
+    {% endif %}
+
+   {% for book in book_list %}
+        {% if forloop.first%}
+            <li>begin</li>
+        {% endif %}
+         {% if forloop.last%}
+            <li>last</li>
+        {% endif %}
+
+        <li>{{book | upper | lower | capfirst}}</li>
+ <!--
+        <li>forloop.counter:{{forloop.counter}}</li>
+        <li>forloop.counter0:{{forloop.counter0}}</li>
+        <li>forloop.revcounter:{{forloop.revcounter}}</li>
+        <li>forloop.revcounter0:{{forloop.revcounter0}}</li>-->
+   {% empty%}
+        <li>没有书籍</li>
+   {% endfor %}
+
+   {% load percent %}
+
+    <li> today is {{today| date:"Y-m-d" | percent}}</li>
+   {% for key in user %}
+        <li> {{key}}</li>
+   {% endfor %}
+
+   {% for key,value in user.items reversed%}
+        <li> {{key}}:{{value}}</li>
+   {% endfor %}
+
+
+
+  <li>bool list: {{book_list.0}}</li>
+  <li>bool list: {{book_list.1}}</li>
+  <li>bool list: {{book_list.2}}</li>
+  </body>
+ </html>

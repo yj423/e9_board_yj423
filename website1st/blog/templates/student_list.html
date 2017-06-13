@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang='en'>
+ <head>
+  <meta charset='UFT-8'>
+  <meta name="Generator" content="EditPlus">
+  <meta name="Author" content="">
+  <meta name="Author" content="">
+  <meta name="Author" content="">
+  <title>{{title}}</title>
+  </head>
+
+    {% for student in studentList %}
+        <li> {{ student.id}},  {{ student.name}}, {{ student.age}}, {{student.teacher.name}}</li>
+    {% endfor %}
+  </body>
+ </html>
